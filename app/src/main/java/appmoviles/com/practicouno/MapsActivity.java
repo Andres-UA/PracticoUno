@@ -5,9 +5,11 @@ import android.annotation.SuppressLint;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.view.View;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -29,6 +31,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Marker myLocation;
     private static final int REQUEST_CODE = 11;
     private LocationManager manager;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,21 +101,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 LatLng pos = new LatLng(location.getLatitude(), location.getLongitude());
                 myLocation.setPosition(pos);
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(myLocation.getPosition()));
-                boolean biblioteca = comprobarBiblioteca(pos);
+                int opcion = -1;
+                boolean biblioteca = true;
                 if (biblioteca) {
                     // Abrir Canje
+                    // boton.setVisibility(View.VISIBLE);
+                    opcion = 1;
                 } else {
-                    boolean cafeteria = comprobarBiblioteca(pos);
+                    opcion = 2;
+                    boolean cafeteria = true;
                     if (cafeteria) {
                         // Abrir Preguntas
+
                     } else {
-                        boolean edificioC = comprobarEdificioC(pos);
+                        boolean edificioC = false;
                         // Abrir Preguntas
-
                     }
-
                 }
-
             }
 
             @Override
