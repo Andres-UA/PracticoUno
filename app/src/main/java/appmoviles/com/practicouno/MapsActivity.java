@@ -34,7 +34,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final int REQUEST_CODE = 11;
     private LocationManager manager;
 
-    Polyline Biblioteca;
+    private int opcion = 0;
+
+    Polyline polyBiblioteca;
+    Polyline polyEdificioC;
+    Polyline polyCafeteria;
+
+    FloatingActionButton boton = (FloatingActionButton) findViewById(R.id.boton_acciones);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +51,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         manager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        boton.hide();
     }
 
 
@@ -74,7 +81,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
         mMap.moveCamera(CameraUpdateFactory.zoomTo(20));
 
-        Biblioteca = mMap.addPolyline(new PolylineOptions().add(
+        polyBiblioteca = mMap.addPolyline(new PolylineOptions().add(
                 new LatLng(3.341934, -76.530068),
                 new LatLng(3.341928, -76.529800),
                 new LatLng(3.341666, -76.529800),
@@ -82,7 +89,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 new LatLng(3.341934, -76.530068)
         ));
 
-        Polyline EdificioC = mMap.addPolyline(new PolylineOptions().add(
+        polyEdificioC = mMap.addPolyline(new PolylineOptions().add(
                 new LatLng(3.341254, -76.530411),
                 new LatLng(3.341243, -76.529859),
                 new LatLng(3.341061, -76.529875),
@@ -90,7 +97,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 new LatLng(3.341254, -76.530411)
         ));
 
-        Polyline Cafeteria = mMap.addPolyline(new PolylineOptions().add(
+        polyCafeteria = mMap.addPolyline(new PolylineOptions().add(
                 new LatLng(3.342255, -76.529703),
                 new LatLng(3.342260, -76.529478),
                 new LatLng(3.341886, -76.529500),
@@ -98,29 +105,34 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 new LatLng(3.342255, -76.529703)
         ));
 
+
         manager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 1, new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
                 LatLng pos = new LatLng(location.getLatitude(), location.getLongitude());
                 myLocation.setPosition(pos);
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(myLocation.getPosition()));
-                int opcion = -1;
+
                 boolean biblioteca = comprobarBiblioteca(pos);
+                boolean cafeteria = comprobarCafeteria(pos);
+                boolean edificioC = comprobarEdificioC(pos);
+
                 if (biblioteca) {
                     // Abrir Canje
-                    // boton.setVisibility(View.VISIBLE);
-    Toast.makeText(getApplication(),biblioteca+"",Toast.LENGTH_LONG).show();
                     opcion = 1;
-                } else {
+                    boton.show();
+                } else if (cafeteria) {
+                    // Abrir Preguntas
+                    boton.show();
                     opcion = 2;
-                    boolean cafeteria = true;
-                    if (cafeteria) {
-                        // Abrir Preguntas
+                } else if (edificioC) {
+                    // Abrir Preguntas
+                    boton.show();
+                    opcion = 2;
 
-                    } else {
-                        boolean edificioC = false;
-                        // Abrir Preguntas
-                    }
+                } else {
+                    boton.hide();
+                    opcion = 0;
                 }
             }
 
@@ -142,63 +154,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
+
     public boolean comprobarBiblioteca(LatLng actual) {
-        boolean estoy = PolyUtil.containsLocation(actual, Biblioteca.getPoints(), true);
+        boolean estoy = PolyUtil.containsLocation(actual, polyBiblioteca.getPoints(), true);
         return estoy;
     }
 
     public boolean comprobarEdificioC(LatLng actual) {
-        boolean estoy = false;
-        LatLng[] c = new LatLng[4];
-        c[0] = new LatLng(3.341254, -76.530411);
-        c[0] = new LatLng(3.341243, -76.529859);
-        c[0] = new LatLng(3.341061, -76.529875);
-        c[0] = new LatLng(3.341066, -76.530443);
-        estoy = dentroPoligono(c, actual);
+        boolean estoy = PolyUtil.containsLocation(actual, polyEdificioC.getPoints(), true);
         return estoy;
     }
 
     public boolean comprobarCafeteria(LatLng actual) {
-        boolean estoy = false;
-        LatLng[] bilioteca = new LatLng[4];
-
-        bilioteca[0] = new LatLng(3.342255, -76.529703);
-        bilioteca[0] = new LatLng(3.341886, -76.529500);
-        bilioteca[0] = new LatLng(3.341886, -76.529500);
-        bilioteca[0] = new LatLng(3.341896, -76.529709);
-        estoy = dentroPoligono(bilioteca, actual);
+        boolean estoy = PolyUtil.containsLocation(actual, polyCafeteria.getPoints(), true);
         return estoy;
-    }
-
-    public boolean dentroPoligono(LatLng[] puntos, LatLng actual) {
-        int counter = 0;
-        int i;
-        double xinters;
-        LatLng p1 = new LatLng(0, 0);
-        LatLng p2 = new LatLng(0, 0);
-        int n = puntos.length;
-
-        p1 = puntos[0];
-        for (i = 1; i <= n; i++) {
-            p2 = puntos[i % n];
-            if (actual.latitude > Math.min(p1.latitude, p2.latitude)) {
-                if (actual.latitude <= Math.max(p1.latitude, p2.latitude)) {
-                    if (actual.longitude <= Math.max(p1.longitude, p2.longitude)) {
-                        if (p1.latitude != p2.latitude) {
-                            xinters = (actual.latitude - p1.latitude) * (p2.longitude - p1.longitude) / (p2.latitude - p1.latitude) + p1.longitude;
-                            if (p1.longitude == p2.longitude || actual.longitude <= xinters)
-                                counter++;
-                        }
-                    }
-                }
-            }
-            p1 = p2;
-        }
-        if (counter % 2 == 0) {
-            return false;
-        } else {
-            return true;
-        }
     }
 
     @Override
