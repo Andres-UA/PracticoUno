@@ -10,6 +10,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -23,6 +24,7 @@ import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.maps.android.PolyUtil;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -32,6 +34,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final int REQUEST_CODE = 11;
     private LocationManager manager;
 
+    Polyline Biblioteca;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,7 +74,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
         mMap.moveCamera(CameraUpdateFactory.zoomTo(20));
 
-        Polyline Biblioteca = mMap.addPolyline(new PolylineOptions().add(
+        Biblioteca = mMap.addPolyline(new PolylineOptions().add(
                 new LatLng(3.341934, -76.530068),
                 new LatLng(3.341928, -76.529800),
                 new LatLng(3.341666, -76.529800),
@@ -102,10 +105,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 myLocation.setPosition(pos);
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(myLocation.getPosition()));
                 int opcion = -1;
-                boolean biblioteca = true;
+                boolean biblioteca = comprobarBiblioteca(pos);
                 if (biblioteca) {
                     // Abrir Canje
                     // boton.setVisibility(View.VISIBLE);
+    Toast.makeText(getApplication(),biblioteca+"",Toast.LENGTH_LONG).show();
                     opcion = 1;
                 } else {
                     opcion = 2;
@@ -139,13 +143,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public boolean comprobarBiblioteca(LatLng actual) {
-        boolean estoy = false;
-        LatLng[] bilioteca = new LatLng[4];
-        bilioteca[0] = new LatLng(3.341934, -76.530068);
-        bilioteca[0] = new LatLng(3.341928, -76.529800);
-        bilioteca[0] = new LatLng(3.341666, -76.529800);
-        bilioteca[0] = new LatLng(3.341671, -76.530089);
-        estoy = dentroPoligono(bilioteca, actual);
+        boolean estoy = PolyUtil.containsLocation(actual, Biblioteca.getPoints(), true);
         return estoy;
     }
 
