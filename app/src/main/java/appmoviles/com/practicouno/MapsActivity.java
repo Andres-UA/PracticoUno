@@ -2,6 +2,7 @@ package appmoviles.com.practicouno;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -40,18 +41,62 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     Polyline polyEdificioC;
     Polyline polyCafeteria;
 
-    FloatingActionButton boton = (FloatingActionButton) findViewById(R.id.boton_acciones);
+    private int points = 0;
+    private FloatingActionButton boton;
+    private FloatingActionButton boton_canje;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
+        Intent intent = getIntent();
+        if (intent != null) {
+            points = intent.getIntExtra("Points", 0);
+        }
+
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         manager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        boton = findViewById(R.id.boton_accion);
+        boton_canje = findViewById(R.id.boton_accion_2);
+        boton_canje.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                launchNewActivityCanje();
+            }
+        });
+        boton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                launchNewActivity();
+            }
+        });
         boton.hide();
+        boton_canje.hide();
+    }
+
+    private void launchNewActivity() {
+        if (opcion == 1) {
+            Intent intent = new Intent(this, Canje.class);
+            intent.putExtra("Points", points);
+            startActivity(intent);
+        } else if (opcion == 2) {
+            Intent intent = new Intent(this, Preguntas.class);
+            intent.putExtra("Points", points);
+            startActivity(intent);
+        } else {
+            Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void launchNewActivityCanje() {
+        Intent intent = new Intent(this, Canje.class);
+        intent.putExtra("Points", points);
+        startActivity(intent);
     }
 
 
@@ -106,7 +151,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         ));
 
 
-        manager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 1, new LocationListener() {
+        manager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 500, 1, new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
                 LatLng pos = new LatLng(location.getLatitude(), location.getLongitude());
@@ -117,10 +162,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 boolean cafeteria = comprobarCafeteria(pos);
                 boolean edificioC = comprobarEdificioC(pos);
 
+
                 if (biblioteca) {
                     // Abrir Canje
                     opcion = 1;
                     boton.show();
+
                 } else if (cafeteria) {
                     // Abrir Preguntas
                     boton.show();

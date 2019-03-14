@@ -14,22 +14,51 @@
         android:textSize="50sp"
         android:textAlignment="center"
         android:layout_marginTop="70dp"
-        android:layout_marginBottom="20dp"/>
+        android:layout_marginBottom="20dp"
+        android:id="@+id/tv_question"/>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Escriba una respuesta"
+        android:text="Seleccione una respuesta"
         android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"/>
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="20dp"/>
 
-    <EditText
+
+    <RadioGroup
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginRight="70dp"
-        android:layout_marginLeft="70dp"
-        android:layout_marginTop="20dp"
-        android:inputType="number"/>
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp"
+        android:id="@+id/rg_answer_options">
+
+        <RadioButton
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="1"
+            android:id="@+id/answer_a"/>
+
+        <RadioButton
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="2"
+            android:id="@+id/answer_b"/>
+
+        <RadioButton
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="3"
+            android:id="@+id/answer_c"/>
+
+        <RadioButton
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="4"
+            android:id="@+id/answer_d"/>
+
+
+    </RadioGroup>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -38,7 +67,8 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Enviar"/>
+            android:text="Enviar"
+            android:id="@+id/btn_send_answer"/>
     </LinearLayout>
 
 
